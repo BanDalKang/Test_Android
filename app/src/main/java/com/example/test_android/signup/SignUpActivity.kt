@@ -1,11 +1,19 @@
 package com.example.test_android.signup
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.example.test_android.R
+import com.example.test_android.data.ResponseSignUp
+import com.example.test_android.data.ServiceCreator
+import com.example.test_android.data.UserData
 import com.example.test_android.databinding.ActivitySignUpBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -19,17 +27,37 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun signUpDoneButtonClickListener() = binding.btnSignUpDone.setOnClickListener {
-        with(binding) {
-            val id = etId.text.toString()
-            val pw = etPw.text.toString()
-            if (id == "" || pw == "") {
-                Toast.makeText(this@SignUpActivity, "회원정보를 모두 입력해주세요.", Toast.LENGTH_LONG).show()
-            } else {
-                val checkId = Toast.makeText(this@SignUpActivity, "가입 완료 되었습니다.", Toast.LENGTH_LONG).show()
-                //가입 완료 시 로그인 페이지로 이동 구현
-                //아이디가 db에 존재할 경우 조건 추가
-            }
+        val id = binding.etId.text.toString()
+        val pw = binding.etPw.text.toString()
+        val userData = UserData(id, pw)
+        if (id == "" || pw == "") {
+            Toast.makeText(this@SignUpActivity, "회원정보를 모두 입력해주세요.", Toast.LENGTH_LONG).show()
+        } else {
+            userNetwork(userData)
         }
+    }
+
+    //기존에 등록된 id일 경우 조건 추가
+    private fun userNetwork(userInfo: UserData) {
+        val call: Call<ResponseSignUp> = ServiceCreator.userService.addUser(userInfo)
+
+        call.enqueue(object : Callback<ResponseSignUp> {
+            override fun onResponse(
+                call: Call<ResponseSignUp>, response: Response<ResponseSignUp>
+            ) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    Log.d("회원가입 성공", "$result")
+                    Toast.makeText(this@SignUpActivity, "가입 완료 되었습니다.", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this@SignUpActivity, LogInActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseSignUp>, t: Throwable) {
+                Log.d("회원가입 실패", t.message.toString())
+            }
+        })
     }
 
 }
