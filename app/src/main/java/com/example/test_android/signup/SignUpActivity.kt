@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.example.test_android.R
-import com.example.test_android.data.ResponseSignUp
+import com.example.test_android.data.ResponseData
 import com.example.test_android.data.ServiceCreator
 import com.example.test_android.data.UserData
 import com.example.test_android.databinding.ActivitySignUpBinding
@@ -39,11 +39,11 @@ class SignUpActivity : AppCompatActivity() {
 
     //기존에 등록된 id일 경우 조건 추가
     private fun userNetwork(userInfo: UserData) {
-        val call: Call<ResponseSignUp> = ServiceCreator.userService.addUser(userInfo)
+        val call: Call<ResponseData> = ServiceCreator.userService.addUser(userInfo)
 
-        call.enqueue(object : Callback<ResponseSignUp> {
+        call.enqueue(object : Callback<ResponseData> {
             override fun onResponse(
-                call: Call<ResponseSignUp>, response: Response<ResponseSignUp>
+                call: Call<ResponseData>, response: Response<ResponseData>
             ) {
                 if (response.isSuccessful) {
                     val result = response.body()
@@ -54,7 +54,7 @@ class SignUpActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<ResponseSignUp>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseData>, t: Throwable) {
                 Log.d("회원가입 실패", t.message.toString())
             }
         })

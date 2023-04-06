@@ -6,5 +6,5 @@ import retrofit2.http.POST
 
 interface UserService {
     @POST("signup")
-    fun addUser(@Body userInfo: UserData): Call<ResponseSignUp>
+    fun addUser(@Body userInfo: UserData): Call<ResponseData>
 }
